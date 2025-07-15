@@ -302,8 +302,22 @@ local function OpenPhone()
                 newPhoneProp()
             end)
 
-            QBCore.Functions.TriggerCallback('qb-garages:server:GetPlayerVehicles', function(vehicles)
-                PhoneData.GarageVehicles = vehicles
+            QBCore.Functions.TriggerCallback('lunar_garage:getPlayerVehicles', function(vehicles)
+                PhoneData.GarageVehicles = {}
+                for k, v in pairs(vehicles or {}) do
+                    local props = v.props or (v.mods and json.decode(v.mods)) or {}
+                    table.insert(PhoneData.GarageVehicles, {
+                        fullname = props.brand and (props.brand .. ' ' .. (props.name or "")) or (props.name or ""),
+                        brand = props.brand or "",
+                        model = props.name or "",
+                        plate = props.plate or v.plate,
+                        garage = v.garage or v.garageLabel or "",
+                        state = v.state or "",
+                        fuel = props.fuelLevel or v.fuelLevel or v.fuel or 100,
+                        engine = props.engineHealth or v.engineHealth or v.engine or 1000,
+                        body = props.bodyHealth or v.bodyHealth or v.body or 1000
+                    })
+                end
             end)
         else
             QBCore.Functions.Notify("You don't have a phone", 'error')
