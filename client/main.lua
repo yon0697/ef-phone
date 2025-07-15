@@ -878,12 +878,13 @@ end)
 
 RegisterNUICallback('track-vehicle', function(data, cb)
     local veh = data.veh
-    if findVehFromPlateAndLocate(veh.plate) then
-        QBCore.Functions.Notify('Your vehicle has been marked', 'success')
-    else
-        QBCore.Functions.Notify('This vehicle cannot be located', 'error')
+    if not veh or not veh.plate then
+        cb({ success = false, message = 'No vehicle plate sent!'})
+        return
     end
-    cb('ok')
+    QBCore.Functions.TriggerCallback('lunar_garage:retrieveVehicle', function(success)
+        cb({ success = success })
+    end, veh.index or 1, veh.plate, veh.model or "car")
 end)
 
 RegisterNUICallback('DeleteContact', function(data, cb)
